@@ -3,6 +3,9 @@ import json
 import numpy as np
 import mediapipe as mp
 import cv2
+import sys
+from sklearn.linear_model import LogisticRegression
+
 
 def detect_hand_landmarks(image):
     mp_drawing = mp.solutions.drawing_utils
@@ -33,14 +36,20 @@ def detect_hand_landmarks(image):
 def preprocess_landmarks(landmarks):
     return np.array([[point.x, point.y, point.z]for point in landmarks.multi_hand_landmarks[0].landmark]).flatten()
 
-with open('model.pkl', 'rb') as read_file:
+model_path = sys.argv[1]
+img_json_path = sys.argv[2]
+
+
+with open(model_path, 'rb') as read_file:
     model = pickle.load(read_file)
 
 
-with open('img.json', 'rb') as read_file:
+with open(img_json_path, 'r') as read_file:
     img = json.load(read_file)
 
-img_data = img['data']
+img_data = np.array(img['data'],  dtype=np.uint8)
+
+
 
 signs = ['open-hand', 'rock-on', 'peace', 'surf']
 
